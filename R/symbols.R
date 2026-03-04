@@ -28,13 +28,29 @@ check_symbols <- function(path, glibc_max = "2.28", glibcxx_max = NULL) {
 
 #' Parse readelf -sW Output for Version Issues
 #'
+#' Only parses symbols from the .dynsym section (dynamic symbols needed
+#' at runtime). Skips .symtab which contains debug/static symbols and
+#' would cause duplicates.
+#'
 #' @noRd
 .parse_symbol_issues <- function(lines, glibc_max, glibcxx_max) {
     threshold_glibc <- .parse_version(glibc_max)
     issues <- character()
     max_found <- NA_character_
+    in_dynsym <- FALSE
 
     for (line in lines) {
+        if (grepl("^Symbol table '\\.dynsym'", line)) {
+            in_dynsym <- TRUE
+            next
+        }
+        if (grepl("^Symbol table '", line)) {
+            in_dynsym <- FALSE
+            next
+        }
+        if (!in_dynsym) {
+            next
+        }
         m <- regmatches(line, regexpr("@GLIBC_([0-9]+\\.[0-9]+(\\.[0-9]+)?)",
                                       line, perl = TRUE))
         if (length(m) > 0L && nchar(m) > 0L) {
