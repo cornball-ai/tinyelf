@@ -14,6 +14,9 @@
 #'   Default is \code{manylinux_libs()}.
 #' @param rpath_ok Character vector of permitted rpath prefixes.
 #'   Default \code{c("$ORIGIN", "$LIB")}.
+#' @param transitive Logical. If FALSE (default), check only direct
+#'   dependencies. If TRUE, check the full transitive closure via ldd
+#'   (includes indirect deps from libR.so, etc.).
 #' @param machine_readable Logical. If TRUE, return results list without
 #'   printing. Default FALSE.
 #'
@@ -42,7 +45,7 @@
 #' }
 audit_so <- function(path = ".", glibc_max = "2.28", glibcxx_max = NULL,
                      allowlist = manylinux_libs(),
-                     rpath_ok = c("$ORIGIN", "$LIB"),
+                     rpath_ok = c("$ORIGIN", "$LIB"), transitive = FALSE,
                      machine_readable = FALSE) {
     .require_linux()
 
@@ -55,7 +58,7 @@ audit_so <- function(path = ".", glibc_max = "2.28", glibcxx_max = NULL,
     results <- lapply(so_files, function(f) {
         sym <- check_symbols(f, glibc_max = glibc_max,
                              glibcxx_max = glibcxx_max)
-        deps <- check_deps(f, allowlist = allowlist)
+        deps <- check_deps(f, allowlist = allowlist, transitive = transitive)
         rp <- check_rpath(f, rpath_ok = rpath_ok)
         list(
              file = f,
