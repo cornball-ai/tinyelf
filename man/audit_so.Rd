@@ -5,7 +5,7 @@
 \usage{
 audit_so(path = ".", glibc_max = "2.28", glibcxx_max = NULL,
          allowlist = manylinux_libs(), rpath_ok = c("$ORIGIN", "$LIB"),
-         machine_readable = FALSE)
+         transitive = FALSE, machine_readable = FALSE)
 }
 \arguments{
 \item{path}{Path to a .so file or a directory. If a directory, all
@@ -22,6 +22,10 @@ Default is \code{manylinux_libs()}.}
 
 \item{rpath_ok}{Character vector of permitted rpath prefixes.
 Default \code{c("$ORIGIN", "$LIB")}.}
+
+\item{transitive}{Logical. If FALSE (default), check only direct
+dependencies. If TRUE, check the full transitive closure via ldd
+(includes indirect deps from libR.so, etc.).}
 
 \item{machine_readable}{Logical. If TRUE, return results list without
 printing. Default FALSE.}

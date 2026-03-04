@@ -73,7 +73,9 @@ check_symbols <- function(path, glibc_max = "2.28", glibcxx_max = NULL) {
 .extract_symbol_name <- function(line) {
     parts <- strsplit(trimws(line), "\\s+")[[1L]]
     at_fields <- grep("@", parts, value = TRUE)
-    if (length(at_fields) == 0L) return("")
+    if (length(at_fields) == 0L) {
+        return("")
+    }
     sub("@.*$", "", at_fields[1L])
 }
 

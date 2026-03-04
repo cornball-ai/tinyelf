@@ -38,3 +38,29 @@ expect_equal(length(res2$missing), 0L)
 # Empty input
 res3 <- tinyelf:::.parse_ldd_output(character(), allowlist)
 expect_true(res3$pass)
+
+# --- Direct deps (readelf NEEDED) ---
+
+# Fabricated readelf -d output with NEEDED entries
+needed_lines <- c(
+  " 0x0000000000000001 (NEEDED)             Shared library: [libR.so]",
+  " 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]",
+  " 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]",
+  " 0x0000000000000001 (NEEDED)             Shared library: [libcurl.so.4]",
+  " 0x000000000000000e (SONAME)             Library soname: [mypkg.so]"
+)
+res4 <- tinyelf:::.parse_needed_output(needed_lines, allowlist)
+# libcurl.so.4 not in allowlist
+expect_false(res4$pass)
+expect_equal(res4$issues, "libcurl.so.4")
+expect_equal(length(res4$all_deps), 4L)
+expect_false("libR.so" %in% res4$issues)
+
+# All NEEDED on allowlist
+clean_needed <- c(
+  " 0x0000000000000001 (NEEDED)             Shared library: [libR.so]",
+  " 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]"
+)
+res5 <- tinyelf:::.parse_needed_output(clean_needed, allowlist)
+expect_true(res5$pass)
+expect_equal(length(res5$issues), 0L)
