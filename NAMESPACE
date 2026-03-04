@@ -1,0 +1,8 @@
+# tinyrox says don't edit this manually, but it can't stop you!
+
+export(audit_so)
+export(check_deps)
+export(check_rpath)
+export(check_symbols)
+export(format_report)
+export(manylinux_libs)

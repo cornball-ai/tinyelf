@@ -1,0 +1,19 @@
+Package: tinyelf
+Title: Audit R Shared Libraries for Portability
+Version: 0.1.0
+Authors@R:
+    person("Troy", "Hernandez", email = "troy@cornball.ai",
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0005-4248-604X"))
+Description: Audits R package shared libraries (.so files) for portability
+    issues on Linux. Checks GLIBC symbol version requirements, unexpected
+    system library dependencies, and hardcoded build paths in rpath/runpath
+    entries. Inspired by Python's auditwheel. Zero dependencies, base R only.
+License: GPL-3
+URL: https://github.com/cornball-ai/tinyelf
+BugReports: https://github.com/cornball-ai/tinyelf/issues
+Encoding: UTF-8
+OS_type: unix
+Suggests:
+    tinytest,
+    tinyrox
