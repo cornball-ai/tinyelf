@@ -32,8 +32,9 @@ expect_equal(length(res3$issues), 2L)
 res4 <- tinyelf:::.parse_symbol_issues(lines, "99.0", NULL)
 expect_true(res4$pass)
 
-# GLIBCXX check
+# GLIBCXX check (needs .dynsym header)
 lines_cxx <- c(
+  "Symbol table '.dynsym' contains 2 entries:",
   "    5: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_createERmm@GLIBCXX_3.4.21 (4)",
   "    6: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND __cxa_atexit@GLIBC_2.17 (3)"
 )
@@ -41,6 +42,16 @@ res5 <- tinyelf:::.parse_symbol_issues(lines_cxx, "2.28", "3.4.20")
 expect_false(res5$pass)
 expect_equal(length(res5$issues), 1L)
 expect_true(grepl("GLIBCXX_3.4.21", res5$issues[1]))
+
+# .symtab symbols should be ignored — no duplicates
+lines_dup <- c(
+  "Symbol table '.dynsym' contains 1 entries:",
+  "    41: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND exp@GLIBC_2.29 (6)",
+  "Symbol table '.symtab' contains 1 entries:",
+  "    41: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND exp@GLIBC_2.29 (6)"
+)
+res6 <- tinyelf:::.parse_symbol_issues(lines_dup, "2.28", NULL)
+expect_equal(length(res6$issues), 1L)
 
 # .extract_symbol_name
 line <- "    41: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND exp@GLIBC_2.29 (6)"
